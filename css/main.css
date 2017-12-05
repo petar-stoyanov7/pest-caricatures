@@ -1,0 +1,39 @@
+body {
+
+}
+
+div.site-logo {
+	height: 200px;
+	width: 100%;
+	background-image: url("../img/top-bar.png");
+	background-repeat: repeat-x;
+}
+div.border {
+	width: 100%;
+	height: auto;
+	margin: 0px;
+	padding: 0px;
+}
+
+img.site-logo {
+	display: block;
+	max-width: 100%;
+	max-height: 180px;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+div.header-border {
+	background-image: url("../img/line-horizontal.png");
+	background-repeat: repeat-x;
+}
+
+
+div.site-content {
+	background-image: url("../img/center-fill.png");
+	background-repeat: repeat-y;
+	background-size: 100%;
+	padding: 20px;
+	margin-left: 25%;
+	margin-right: 25%;
+}
