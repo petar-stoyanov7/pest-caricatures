@@ -37,10 +37,7 @@
 				<a href="gallery.php">GALLERY</a>
 			</span>
 			<span class='navbar-entry'>
-				<a href="#">TAGS</a>
-			</span>
-			<span class='navbar-entry'>
-				<a href="#">ABOUT</a>
+				<a href="about.php">ABOUT</a>
 			</span>
 		</div>
 	</div>
