@@ -1,0 +1,26 @@
+div.gallery-entry {
+	float: left;
+	width: 20vw;
+	height: 20vw;
+	margin: 1%;
+	padding: 1%;
+	overflow: auto;
+	border: 1px solid green;
+}
+
+.gallery-title {
+	margin: 5px auto 5px auto;
+}
+.gallery-image {
+	display: block;
+	max-width: 100%;
+	float: none;
+	margin-left: auto;
+	margin-right: auto;	
+}
+
+span.gallery-description {
+	display: inline-block;
+	margin-top: auto;
+	margin-bottom: 5px;
+}
