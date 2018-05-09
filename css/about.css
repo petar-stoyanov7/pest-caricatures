@@ -1,0 +1,18 @@
+.about-img-l, .about-img-r{
+	display: block;	
+	width: 20vw;
+	margin: 0px 10px 3px 10px;
+}
+
+.about-img-l {
+	float: left;	
+}
+
+.about-img-r {
+	float: right;
+}
+
+.about-me {
+	font-size: 1.2em;
+	text-indent: 1em;
+}
