@@ -6,6 +6,9 @@
 	<link rel="shortcut icon" href="./img/favicon.png" type="image/x-icon">
 	<script src="http://code.jquery.com/jquery-latest.js"></script>
 <?php
+	if (!isset($title)) {
+		$title = "pest карикатури";
+	}
 	foreach ($css_array as $css) {
 		echo '<link rel="stylesheet" type="text/css" href="./css/'.$css.'">';
 	}
@@ -13,11 +16,11 @@
 	foreach ($js_array as $js) {
 		echo '<script type="text/javascript" src="./js/'.$js.'"></script>';
 	}
-
+	echo '<title>'.$title.'</title>';
 ?>
 	
 	
-	<title>Карикатури pest</title>
+	
 </head>
 <body>
 <header>	
@@ -28,7 +31,7 @@
 	</div>
 </header>
 <div id='anchor'></div>
-<div id='navigation-bar'>
+<div id='navigation-bar'>	
 		<div class='navbar'>
 			<span class='navbar-entry'>
 				<a href="./index.php">HOME</a>

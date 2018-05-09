@@ -1,7 +1,8 @@
 <?php
 	$css_array = array('main.css', 'gallery.css');
 	$js_array = array('toolbar.js');
-	require_once('header.php');
+	$title = "pest Галерия";
+	require_once('header.php');	
 ?>
 <div class='site-content'>
 

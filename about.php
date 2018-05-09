@@ -1,6 +1,7 @@
 <?php
 	$css_array = array('main.css', 'about.css');
 	$js_array = array('toolbar.js');
+	$title = "Искрено и лично";
 	require_once('header.php');
 ?>
 <div class='site-content'>
