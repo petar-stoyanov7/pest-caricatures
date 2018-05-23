@@ -1,3 +1,15 @@
+<?php
+	function __autoload($classname) {
+		require_once("./obj/".$classname.".php");
+	}
+	require_once("functions.php");
+	#If we implement it one day
+	//require_once("functions.php");
+	//session_start();
+	// if (!isset($auth_ignore)) {
+	// 	include("auth.php");
+	// }
+?>
 <!DOCTYPE html>
 <html>
 <head>
@@ -12,10 +24,10 @@
 	foreach ($css_array as $css) {
 		echo '<link rel="stylesheet" type="text/css" href="./css/'.$css.'">';
 	}
-
-	foreach ($js_array as $js) {
-		echo '<script type="text/javascript" src="./js/'.$js.'"></script>';
-	}
+	/// moved in the footer. Some scripts relied on content being already generated.
+	// foreach ($js_array as $js) {
+	// 	echo '<script type="text/javascript" src="./js/'.$js.'"></script>';
+	// }
 	echo '<title>'.$title.'</title>';
 ?>
 	
@@ -40,7 +52,13 @@
 				<a href="gallery.php">GALLERY</a>
 			</span>
 			<span class='navbar-entry'>
+				<a href="caricature.php?random=1">RANDOM</a>
+			</span>
+			<span class='navbar-entry'>
 				<a href="about.php">ABOUT</a>
+			</span>
+			<span class='navbar-entry'>
+				<a href="new.php">ADD</a>
 			</span>
 		</div>
 	</div>

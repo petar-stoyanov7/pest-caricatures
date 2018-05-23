@@ -1,51 +1,48 @@
 <?php
+	
 	$css_array = array('main.css', 'caricature.css');
-	$js_array = array('toolbar.js');
+	$js_array = array('toolbar.js', 'navigate.js');
 	require_once('header.php');
 
-	$caricature = $_GET['caricature'];
+	$caricature_dao = new Caricature_DAO();
+	
 	# This must be removed later on - intended just to show some titles!
-	switch ($caricature) {
-		case 'sra':
-			$title = "Сра процедури";
-			$description = "Мястото за релакс, отпускане на душата и други неща.";
-			$prev = 'paladka';
-			$next = 'rakiata';
-			break;
-		case 'rakiata':
-			$title = "Ракията се пробужда";
-			$description = "Пиян Соло и Чичака в поредното им приключение в земите на Шоплъка!";
-			$prev = 'sra';
-			$next = 'kornelias';			
-			break;
-		case 'kornelias':
-			$title = "Корнелиас Нинрънър";
-			$description = "Кралицата-банши на пенсионираните!";
-			$prev = 'rakiata';
-			$next = 'paladka';
-			break;
-		case 'paladka':
-			$title = "ПалаДка";
-			$description = "Вече къмпингуването е разрешено. В орпеделените за целта места. И при плащането на определените от \"държавата\" хора";
-			$prev = 'kornelias';
-			$next = 'sra';
-			break;		
-		default:
-			break;
-	}
+	## Why not titties?!
 ?>
 
 <div class='site-content'>
 <?php
+	
+	if (!isset($_GET['cid']) || $_GET['cid'] == "" || 
+		(isset($_GET['random']) && $_GET['random'] == 1)
+		) {
+		$caricature_id = $caricature_dao->random_caricature();
+		$Caricature = $caricature_dao->caricature_by_id($caricature_id);
+		$title = "[ Случайна ] ".$Caricature['title'];
+		$next = "random=1";
+		$previous = "random=1";
+	} else {
+		$caricature_id = $_GET['cid'];
+		$gallery_id = $caricature_dao->get_category($caricature_id);
+		$Caricature = $caricature_dao->caricature_by_id($caricature_id);
+		$title = $Caricature['title'];
+		$next_id = $caricature_dao->next_caricature($caricature_id, $gallery_id);
+		$previous_id = $caricature_dao->previous_caricature($caricature_id, $gallery_id);
+		$next = "cid=".$next_id;
+		$previous = "cid=".$previous_id;
+	}
 	echo "<h1 class='caricature-title'>".$title."</h1>";
-	echo "<a href='./static/".$caricature.".png' target='_blank'>";
-	echo "<img class='caricature' src='./static/".$caricature.".png'>";
+	echo "<a href='".$Caricature['path']."' target='_blank'>";
+	echo "<img class='caricature' src='".$Caricature['path']."'>";
 	echo "</a>";
-	echo "<span class='caricature-description'>".$description."</span><br>";
-	echo "<a id='caricature-prev' href='caricature.php?caricature=".$prev."'> << </a>";
-	echo "<a id='caricature-next' href='caricature.php?caricature=".$next."'> >> </a>";
-	echo '<script type="text/javascript" src="./js/navigate.js"></script>'
+	echo "<span class='caricature-description'>".$Caricature['description']."</span><br>";
+	echo "<a id='caricature-prev' href='caricature.php?".$previous."'> << </a>";
+	echo "<a id='caricature-next' href='caricature.php?".$next."'> >> </a>";
+	
+	echo '<script type="text/javascript">document.title = <?= json_encode($title) ?>;</script>';
+	
 ?>
+
 </div>
 
 <?php require_once('footer.php'); ?>

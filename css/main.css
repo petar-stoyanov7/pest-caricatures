@@ -69,17 +69,33 @@ div.site-content {
 	margin-left: 25%;
 	margin-right: 25%;
 	height: auto;
-	min-height: 80%;
+	min-height: 75%;
 	overflow: auto;
 }
 
 div.footer {
 	background-image: url("../img/bot-bar.png");
-	height: 15px;
+	height: 50px;
 	background-size: 15%;
 	text-align: center;
 	margin-left: auto;
 	margin-right: auto;
+}
+
+span.next {
+	float: right;
+}
+
+span.previous {
+	float: left;
+}
+
+a:link {
+	color: #000000;
+}
+
+a:visited {
+	color: #333333;
 }
 
 footer {
