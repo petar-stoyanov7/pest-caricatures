@@ -11,6 +11,10 @@ body {
 	height: 100%;
 }
 
+#edit-item {
+	float: right;
+}
+
 #navigation-bar {
 	margitn-top: 2px;
 	width: 60%;
@@ -90,12 +94,20 @@ span.previous {
 	float: left;
 }
 
+div.timeline a {
+	color: #000000;
+	background-color: #FFFFFF;
+	text-decoration: none;
+}
+
 a:link {
 	color: #000000;
+	background-color: #e6e6e6;
 }
 
 a:visited {
 	color: #333333;
+	background-color: #e6e6e6;
 }
 
 footer {
@@ -105,4 +117,8 @@ footer {
     bottom: 0;
     height: 18px;
     width: 100%;
+}
+
+hr:last-of-type {
+	display: none;
 }

@@ -6,7 +6,6 @@ var disabledColor = "#cccccc";
 
 
 function disablePrevious() {
-	console.log("Hiding previous");
 	prevLink.removeAttribute('href');
 	prevSpan.style.color = disabledColor;
 }

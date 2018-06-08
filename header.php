@@ -3,12 +3,8 @@
 		require_once("./obj/".$classname.".php");
 	}
 	require_once("functions.php");
-	#If we implement it one day
-	//require_once("functions.php");
-	//session_start();
-	// if (!isset($auth_ignore)) {
-	// 	include("auth.php");
-	// }
+	$View = new View();
+	$View->first_visit();
 ?>
 <!DOCTYPE html>
 <html>
@@ -24,6 +20,7 @@
 	foreach ($css_array as $css) {
 		echo '<link rel="stylesheet" type="text/css" href="./css/'.$css.'">';
 	}
+	echo '<link rel="stylesheet" type="text/css" href="./css/popup.css">';
 	/// moved in the footer. Some scripts relied on content being already generated.
 	// foreach ($js_array as $js) {
 	// 	echo '<script type="text/javascript" src="./js/'.$js.'"></script>';
@@ -43,22 +40,4 @@
 	</div>
 </header>
 <div id='anchor'></div>
-<div id='navigation-bar'>	
-		<div class='navbar'>
-			<span class='navbar-entry'>
-				<a href="./index.php">HOME</a>
-			</span>
-			<span class='navbar-entry'>
-				<a href="gallery.php">GALLERY</a>
-			</span>
-			<span class='navbar-entry'>
-				<a href="caricature.php?random=1">RANDOM</a>
-			</span>
-			<span class='navbar-entry'>
-				<a href="about.php">ABOUT</a>
-			</span>
-			<span class='navbar-entry'>
-				<a href="new.php">ADD</a>
-			</span>
-		</div>
-	</div>
+<?php $View->show_toolbar(); ?>		

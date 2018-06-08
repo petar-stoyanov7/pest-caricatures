@@ -1,17 +1,15 @@
 var formSelector = document.querySelector('select#type');
-var caricatureContainer = document.querySelector('div#add-caricature')
-var postContainer = document.querySelector('div#add-post')
+var caricatureContainer = document.querySelector('div#add-caricature');
+var postContainer = document.querySelector('div#add-post');
 
 hidePost();
 
 function hidePost() {
-	console.log('is it going here "post"');
 	postContainer.style.display = 'none';
 	caricatureContainer.style.display = 'block';
 }
 
 function hideCaricature() {
-	console.log('is it going here "caricature"');
 	postContainer.style.display = 'block';
 	caricatureContainer.style.display = 'none';
 }
@@ -39,6 +37,64 @@ formSelector.addEventListener('change', function()
 	}
 });
 
+function makeSelected(select, compare) {
+	for (i = 0; i < select.length; i++) {
+		if (select[i].value == compare) {
+			select[i].setAttribute('selected', true);
+		}
+	}
+}
+
+function fillCaricatureData(caricature) {
+	hidePost();
+	var type = document.getElementById('type');
+	var title = document.querySelector('input#title');
+	var id = document.querySelector('input#id');
+	var category = document.getElementById('category');
+	var isPost = document.getElementById('is-post');
+	var isPinned = document.getElementById('is-pinned');
+	var description = document.getElementById('description');
+	var update = document.createElement('input');
+	update.name = 'update';
+	update.id = 'is-update';
+	update.value = 1;
+	update.type = 'hidden';
+	document.querySelector('div#add-caricature').appendChild(update);
+
+	makeSelected(type, "caricature");
+	makeSelected(category, caricature.cid);
+	makeSelected(isPost, caricature.is_post);
+	makeSelected(isPinned, caricature.is_pinned);
+	
+	description.value = caricature.description;
+	title.value = caricature.title;
+	id.value = caricature.id
+}
+
+function fillPostData(post) {
+	hideCaricature();
+	var type = document.getElementById('type');
+	var title = document.querySelector('input#title');
+	var id = document.getElementById('id');
+	var text = document.getElementById('content')
+	var isPost = document.getElementById('is-post2');
+	var isPinned = document.getElementById('is-pinned2');
+	var update = document.createElement('input');
+	update.name = 'update';
+	update.id = 'is-update';
+	update.value = 1;
+	update.type = 'hidden';
+	document.querySelector('div#add-post').appendChild(update);
+
+	makeSelected(type, "post");
+	makeSelected(isPost, post.is_post);
+	makeSelected(isPinned, post.is_pinned);
+
+	id.value = post.id;
+	title.value = post.title;
+	text.value = post.text;
+}
+
 var catSelector = document.querySelector('select#category');
 var container = document.querySelector('div#category-add');
 catSelector.addEventListener('change', function() 
@@ -53,7 +109,7 @@ catSelector.addEventListener('change', function()
 				displayNewCategory();
 				break;
 			default:
-				clearElement(container);
+				container.innerHTML = "";
 				break;
 		}
 	}

@@ -1,7 +1,8 @@
 <?php
 	require_once("./obj/db.php");
+
 	function dt($text, $desc="") {
-		echo "########## ".$desc." ##########";
+		echo "<br>########## ".$desc." ##########";
 		echo "<pre>";
 		print_r($text);
 		echo "</pre>";
@@ -29,5 +30,28 @@
 		$string = cyr_lat($string);
 		$string = preg_replace('/[^A-Za-z0-9\_\.]/', '', $string);
    		return strtolower($string);
-	}	
+	}
+
+	function check_empty($content_array, $index_array) {
+		$counter = 0;
+		foreach ($index_array as $index) {
+			if (empty($content_array[$index])) {
+				$counter++;
+			}
+		}
+		if ($counter == count($index_array) && count($index_array) != 0) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	function delete_empty($content_array, $index_array) {
+		for ($i = 0; $i < count($content_array); $i++) {
+			if(check_empty($content_array[$i], $index_array)) {
+				unset($content_array[$i]);
+			}
+		}
+		return $content_array;
+	}
 ?>

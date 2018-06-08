@@ -19,7 +19,7 @@ class Caricature {
 		$this->category_id = $cid;
 		$this->is_post = $ispost;
 		$this->is_pinned = $ispinned;
-		if ($date != NULL || $date != "") {
+		if (!is_null($date) || $date != "") {
 			$this->date = $date;
 		} else {
 			$this->date = date("Y-m-d H:i:s");
