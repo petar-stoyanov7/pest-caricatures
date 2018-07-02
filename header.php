@@ -21,10 +21,6 @@
 		echo '<link rel="stylesheet" type="text/css" href="./css/'.$css.'">';
 	}
 	echo '<link rel="stylesheet" type="text/css" href="./css/popup.css">';
-	/// moved in the footer. Some scripts relied on content being already generated.
-	// foreach ($js_array as $js) {
-	// 	echo '<script type="text/javascript" src="./js/'.$js.'"></script>';
-	// }
 	echo '<title>'.$title.'</title>';
 ?>
 	

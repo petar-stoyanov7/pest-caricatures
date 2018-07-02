@@ -30,7 +30,7 @@ if (isset($_GET['posts'])) {
 	}
 }
 
-//next/previous pages
+//next\previous pages
 $view->newline(3);
 $view->index_previous($page, $post);
 $view->index_next($page, $post);

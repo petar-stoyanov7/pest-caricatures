@@ -38,8 +38,10 @@ class db {
 		return $this->connection->lastInsertId();
 	}
 
-	public function execute_test($query) {
-		$this->connection->prepare($query);
-		$this->connection->exec($query);
+	public function execute_advanced($query, $data_array) {
+		$stmt = $this->connection->prepare($query, array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
+		$stmt->execute($data_array);
+
+		return $this->connection->lastInsertId();
 	}
 }

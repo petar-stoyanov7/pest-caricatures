@@ -23,6 +23,11 @@ class Caricature_DAO {
 		return $this->db->get_data("SELECT * FROM $this->caricature_table"); 
 	}
 
+	function list_categories() {		
+		$query = "SELECT * FROM Categories";
+		return $this->db->get_data($query);
+	}
+
 	public function category_by_id($id) {
 		return $this->db->get_data("SELECT name FROM $this->category_table WHERE id=".$id)[0]['name'];
 	}
@@ -69,12 +74,12 @@ class Caricature_DAO {
 		if (!isset($result[0])) {
 			return $this->last_caricature($gid);
 		} else {
-			return $result[0]['id'];						
+			return $result[0]['id'];
 		}
 	}
 
 	public function first_caricature($cid = NULL) {
-		$query = "SELECT MIN(id) as min FROM Caricatures";		
+		$query = "SELECT MIN(id) as min FROM Caricatures";
 		if (!is_null($cid)) {
 			$query .= " WHERE `cid` = ".$cid;
 		}
@@ -106,11 +111,6 @@ class Caricature_DAO {
 		} else {
 			return $this->db->get_data("SELECT path FROM $this->category_table WHERE name like '%".$search."%'")[0]['path'];
 		}
-	}
-
-	function list_categories() {		
-		$query = "SELECT * FROM Categories";
-		return $this->db->get_data($query);
 	}
 
 	public function count_caricatures($cid=NULL, $is_post=NULL) {
@@ -146,14 +146,16 @@ class Caricature_DAO {
 		$count = $this->count_caricatures($cid);
 		if ($count > 0) {
 			$first_id = $this->db->get_data("SELECT id FROM `Caricatures` WHERE `cid` =".$cid." LIMIT 1")[0]['id'];
-			$this->db->execute_query("UPDATE `Categories` SET `thumb_id` =".$first_id." WHERE `id` = ".$cid);
+			$data_array = [$first_id, $cid];
+			$this->db->execute_advanced("UPDATE `Categories` SET `thumb_id` = ? WHERE `id` = ?", $data_array);
 		}
 	}
 
 	public function make_cover($cid) {
 		$category_id = $this->get_category_by_id($cid);
-		$query = "UPDATE $this->category_table SET `thumb_id`=".$cid." WHERE `id`=".$category_id;
-		$this->db->execute_query($query);
+		$query = "UPDATE $this->category_table SET `thumb_id`= ? WHERE `id`= ?";
+		$data_array = [$cid, $category_id];
+		$this->db->execute_advanced($query, $data_array);
 	}
 
 	public function get_thumb($cid) {
@@ -179,31 +181,71 @@ class Caricature_DAO {
 		}
 	}
 
-	public function new_category($category_name) {
+	public function delete_directory($path) {
+		if (!is_dir($path)) {
+			throw new InvalidArgumentException("$path must be directory");
+		}
+		if (substr($path, strlen($path) - 1, 1) != '/') {
+	        $path .= '/';
+	    }
+	    $files = glob($path.'*', GLOB_MARK);
+	    foreach ($files as $file) {
+	    	if (is_dir($file)) {
+	    		self::delete_directory($file);
+	    	} else {
+	    		unlink($file);
+	    	}
+	    }
+	    rmdir($path);
+	}
+
+	public function new_category($category_name, $category_description="") {
 		$path = "./content/".clean_string(cyr_lat($category_name))."/";
-		$query = "INSERT INTO $this->category_table (`name`, `path`) VALUES ('".$category_name."', '".$path."')";
-		echo "DB: ".$query."<br>";
-		$id = $this->db->execute_query($query);
+		// $query = "INSERT INTO $this->category_table (`name`, `path`) VALUES ('".$category_name."', '".$path."')";
+		$query = "INSERT INTO $this->category_table (`name`, `path`, `description`) VALUES (?, ?, ?)";
+		$data_array = array($category_name, $path, $category_description);
+		$id = $this->db->execute_advanced($query, $data_array);
 		mkdir($path);
 		return $id;
 	}
 
+	public function update_category($id, $name, $description) {
+		$query = "UPDATE $this->category_table SET 
+			`name` = ?, 
+			`description` = ?
+			WHERE `id` = ?";
+		$values = [$name, $description, $id];
+		$this->db->execute_advanced($query, $values);
+	}
+
+	public function delete_category($id) {
+		$path = $this->category_path($id);
+		$this->delete_directory($path);
+		$query = "DELETE FROM $this->caricature_table WHERE `cid` = ".$id;
+		$this->db->execute_query($query);
+		$query = "DELETE FROM $this->category_table WHERE `id` = ".$id;
+		$this->db->execute_query($query);
+	}
+
 	public function new_caricature($caricature) {
 		$insert = "INSERT INTO $this->caricature_table (`title`, `description`, `path`, `cid`, `is_post`, `date`";
-		$values = "VALUES ('".$caricature->title."', '".$caricature->description."', '".$caricature->path."', 
-					".$caricature->category_id.", ".$caricature->is_post.", '".$caricature->date."'";
+		$values_array = [$caricature->title, $caricature->description, $caricature->path, $caricature->category_id,
+						$caricature->is_post, $caricature->date];
+		$values = "VALUES (?, ?, ?, ?, ?, ? ";		
 		if ($caricature->url != "" && !is_null($caricature->url)) {
 			$insert .= ", `url`";
-			$values .= ", '".$caricature->url."'";
+			array_push($values_array, $caricature->url);
+			$values .= ", ?";
 		}
 		if ($caricature->tag_id != "" && !is_null($caricature->tag_id)) {
 			$insert .= ", `tid`";
-			$values .= ", '".$caricature->tag_id."'";
+			array_push($values_array, $caricature->tag_id);
+			$values .= ", ?";
 		}
 		$insert .= " ) ";
 		$values .= " )";
 		$query = $insert.$values;
-		$cid = $this->db->execute_query($query);
+		$cid = $this->db->execute_advanced($query, $values_array);
 		if ($caricature->is_post == 1) {
 			$timeline_item = new Timeline($this->timeline_id, $cid, $caricature->is_pinned, $caricature->date);
 			$this->Timeline_DAO->add_new_item($timeline_item);
@@ -212,7 +254,7 @@ class Caricature_DAO {
 
 	public function add_new_caricature($post, $files) {
 		if ($post['category'] == 'new') {
-			$category = $this->new_category($post['new-category']);
+			$category = $this->new_category($post['new-category'], $post['category-description']);
 		} else {
 			$category = $post['category'];
 		}
@@ -233,13 +275,10 @@ class Caricature_DAO {
 		$is_pinned = $this->Timeline_DAO->is_pinned($id, 1);
 		$timeline_item = new Timeline($this->timeline_id, $id, $http_post['is-pinned'], $caricature['date']);
 		if (($caricature['is_post'] == 0) && ($http_post['is-post'] == 1)) {
-			echo "Make post<br>";
 			$this->Timeline_DAO->add_new_item($timeline_item);
 		} else if (($caricature['is_post'] == 1) && ($http_post['is-post'] == 0)) {
-			echo "Delete post<br>";
 			$this->Timeline_DAO->delete_entry($id, 1);
 		} else if ($http_post['is-pinned'] != $is_pinned) {
-			echo "Change_pinned";
 			$this->Timeline_DAO->update_item($timeline_item);
 		}
 
@@ -254,13 +293,15 @@ class Caricature_DAO {
 			if ($this->file_upload($files, $upload_path)) {
 				$this->delete_file($caricature['path']);
 				$query = "UPDATE $this->caricature_table SET
-						`title` = '".$http_post['title']."', 
-						`description` = '".$http_post['description']."', 
-						`path` = '".$upload_path."', 
-						`cid` = ".$category.", 
-						`is_post` = ".$http_post['is-post']."
-						WHERE `id` = ".$id;
-				$this->db->execute_query($query);
+						`title` = ?, 
+						`description` = ?, 
+						`path` = ?, 
+						`cid` = ?, 
+						`is_post` = ? 
+						WHERE `id` = ?";
+				$values_array = [$http_post['title'], $http_post['description'], $upload_path, 
+						$category, $http_post['is-post'], $id];
+				$this->db->execute_advanced($query, $values_array);
 			}
 		} else {
 			if ($http_post['category'] != $caricature['category']) {
@@ -272,13 +313,15 @@ class Caricature_DAO {
 				$path = $caricature['path'];
 			}
 			$query = "UPDATE $this->caricature_table SET
-						`title` = '".$http_post['title']."', 
-						`description` = '".$http_post['description']."', 
-						`path` = '".$path."', 
-						`cid` = ".$category.", 
-						`is_post` = ".$http_post['is-post']."
-						WHERE `id` = ".$id;
-			$this->db->execute_query($query);
+						`title` = ?, 
+						`description` = ?, 
+						`path` = ?, 
+						`cid` = ?, 
+						`is_post` = ?
+						WHERE `id` = ?";
+			$values_array = [$http_post['title'], $http_post['description'], $path, 
+							$category, $http_post['is-post'], $id];
+			$this->db->execute_advanced($query, $values_array);
 		}
 	}
 
@@ -290,9 +333,10 @@ class Caricature_DAO {
 
 	public function delete_caricature($id) {
 		$caricature = $this->caricature_by_id($id);
-		$query = "DELETE FROM $this->caricature_table WHERE `id` = ".$id;
+		$query = "DELETE FROM $this->caricature_table WHERE `id` = ?";
+		$values_array = [$id];
 		$this->Timeline_DAO->delete_entry($id, 1);
-		$this->db->execute_query($query);		
+		$this->db->execute_advanced($query, $values_array);
 		$this->delete_file($caricature['path']);
 	}
 

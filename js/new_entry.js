@@ -17,7 +17,9 @@ function hideCaricature() {
 function displayNewCategory()
 {	
 	container.innerHTML += '<label for="new">Нова категория: </label>';
-	container.innerHTML += '<input type="text" name="new-category" placeholder="Име на категорията">';
+	container.innerHTML += '<input type="text" name="new-category" placeholder="Име на категорията"><br>';
+	container.innerHTML += '<textarea id="category-description" name="category-description" placeholder="Описание"></textarea><br>';
+
 }
 
 formSelector.addEventListener('change', function()
@@ -72,6 +74,7 @@ function fillCaricatureData(caricature) {
 }
 
 function fillPostData(post) {
+	console.log(post);
 	hideCaricature();
 	var type = document.getElementById('type');
 	var title = document.querySelector('input#title');

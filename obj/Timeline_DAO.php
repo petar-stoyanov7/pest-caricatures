@@ -19,9 +19,10 @@ class Timeline_DAO {
 
 	public function add_new_item($timeline) {
 		$insert = "INSERT INTO $this->timeline_table (`content_type`, `item_id`, `is_pinned`, `date`) ";
-		$values = "VALUES ($timeline->content_type, $timeline->item_id, $timeline->is_pinned, '".$timeline->date."')";
+		$values = "VALUES (?, ?, ?, ?)";
+		$values_array = [$timeline->content_type, $timeline->item_id, $timeline->is_pinned, $timeline->date];
 		$query = $insert.$values;
-		return $this->db->execute_query($query);
+		return $this->db->execute_advanced($query, $values_array);
 	}
 
 	public function count_elements($type=NULL) {
@@ -42,6 +43,8 @@ class Timeline_DAO {
 		$result = $this->db->get_data($query);
 		if (isset($result[0])) {
 			return $result[0]['is_pinned'];
+		} else {
+			return 0;
 		}
 	}
 
@@ -72,19 +75,21 @@ class Timeline_DAO {
 	}
 
 	public function list_only_posts($start=NULL, $number=NULL) {
-		$query = "SELECT Timeline.id, Timeline.content_type as type, Timeline.item_id as iid, Timeline.date, Timeline.is_pinned,
-			Posts.title as post_title, Posts.text as post_text
-			FROM Timeline 
-			LEFT JOIN Posts ON Timeline.item_id = Posts.id AND Timeline.content_type = 2
-			ORDER BY date DESC";	
+		$query = "SELECT Posts.id as post_id, Posts.title as post_title, Posts.text as post_text, Posts.date
+			FROM Posts			
+			ORDER BY date DESC";
 		if (!is_null($start) && !is_null($number)) {
 			$query .= " LIMIT ".$start.",".$number;
 		}
 		$data = $this->db->get_data($query);
 		if (isset($data[0])) {
+			for ($i = 0; $i < count($data); $i++) {
+				$data[$i]['iid'] = $data[$i]['post_id'];
+				$data[$i]['type'] = 2;
+			}
 			return $data;
 		}
-	}
+	}	
 
 	public function list_pinned() {
 		$query = "SELECT Timeline.id, Timeline.content_type as type, Timeline.item_id as iid, Timeline.date, Timeline.is_pinned,

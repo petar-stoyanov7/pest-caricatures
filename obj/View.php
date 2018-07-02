@@ -1,9 +1,9 @@
 <?php
 class View {
-	private $Caricature_DAO;
-	private $Timeline_DAO;
-	private $Post_DAO;
-	private $User_DAO;
+	protected $Caricature_DAO;
+	protected $Timeline_DAO;
+	protected $Post_DAO;
+	protected $User_DAO;
 
 	public function __construct() {
 		$this->Caricature_DAO = new Caricature_DAO();
@@ -122,12 +122,13 @@ class View {
 			echo '<div class="site-content">';
 			foreach ($items as $item) {
 				$thumb = $this->Caricature_DAO->get_thumb($item['thumb_id']);
-				echo "<div class='gallery-entry'>";
-				echo "<a href='gallery.php?gid=".$item['id']."'>";
-				echo "<h4 class='gallery-title'>".$item['name']."</h4>";
-				echo "<img class='gallery-image' src='".$thumb."'>";
-				echo "</a>";
-				echo "</div>";		
+				echo '<div class="gallery-entry">';
+				echo '<a href="gallery.php?gid='.$item['id'].'">';
+				echo '<h4 class="gallery-title">'.$item['name'].'</h4>';
+				echo '<img class="gallery-image" src="'.$thumb.'">';
+				echo '<span class="description">'.$item['description'].'</span>';
+				echo '</a>';
+				echo '</div>';		
 			}
 			echo '</div>';
 			$this->set_title("Галерия");
@@ -172,7 +173,10 @@ class View {
 		echo '</span>';
 		if ($this->User_DAO->check_if_admin()) {
 			echo '<span class="navbar-entry">';
-			echo '<a href="new.php">ADD</a>';
+			echo '<a href="new.php">[+]</a>';
+			echo '</span>';
+			echo '<span class="navbar-entry">';
+			echo '<a href="mng13.php">[adm]</a>';
 			echo '</span>';
 		}
 		echo '</div>';
@@ -183,106 +187,12 @@ class View {
 		echo "<h1 class='caricature-title'>".$title."</h1>";
 		echo "<a href='".$Caricature['path']."' target='_blank'>";
 		echo "<img class='caricature' src='".$Caricature['path']."'>";
-		echo "</a>";
+		echo "</a><br>";
 		echo "<span class='caricature-description'>".$Caricature['description']."</span><br>";
 		echo "<a id='caricature-prev' href='caricature.php?".$previous."'> << </a>";
 		echo "<a id='caricature-next' href='caricature.php?".$next."'> >> </a>";
 	}
-
-
-	public function new_content_form($id=NULL, $type = 1) {
-		if ($this->User_DAO->check_if_admin()) {	
-			$list_categories = $this->Caricature_DAO->list_categories();
-			if (empty($list_categories)) {
-				$this->Caricature_DAO->new_category("Caricatures");
-			}
-			$list_categories = $this->Caricature_DAO->list_categories();
-			echo '<h4 class="title">Add new:</h4>';
-			echo '<form id="form" method="post" action="manage-content.php" enctype="multipart/form-data">';
-			echo '<input name="id" id="id" type="hidden">';
-			echo '<select id="type" name="type">';
-				echo '<option value="caricature" selected>Caricature</option>';
-				echo '<option value="post">Post</option>';
-			echo '</select>';
-			echo '<label for="title">Title</label>';
-			echo '<input id="title" type="text" name="title"><br>';
-			//caricatures
-			echo '<div id="add-caricature">';
-			echo '<label for="category">Category: </label>';
-			echo '<select id="category" name="category">';
-				echo '<optgroup label="Existing">';
-				foreach ($list_categories as $category) {
-					if ($category['id'] == 7) {
-						echo '<option value="'.$category['id'].'" selected>'.$category['name'].'</option>';
-					} else {
-						echo '<option value="'.$category['id'].'">'.$category['name'].'</option>';
-					}
-				}
-				echo '</optgroup>';
-				echo '<optgroup label="New:">';
-					echo '<option value="new">Нова Категория</option>';
-				echo '</optgroup>';
-			echo '</select><br>';
-			echo '<div id="category-add">';
-			echo '</div>';
-			echo '<label for="is-post">post?</label>';
-			echo '<select id="is-post" name="is-post">';
-				echo '<option value=1 selected>yes</option>';
-				echo '<option value=0>no</option>';
-			echo '</select>';
-			echo '<label for="is-pinned"> pinned?</label>';
-			echo '<select id="is-pinned" name="is-pinned">';
-				echo '<option value=1>yes</option>';
-				echo '<option value=0 selected>no</option>';
-			echo '</select><br>';
-			echo '<label for="description">Description:</label><br>';
-			echo '<textarea id="description" name="description" ></textarea><br>';
-			echo '<input id="file-upload"	type="file" name="file-upload"  accept="image/*">';
-			echo '</div>';
-			//post
-			echo '<div id="add-post">';
-			echo '<label for="is-post2">post?</label>';
-			echo '<select id="is-post2" name="is-post2">';
-				echo '<option value=1 selected>yes</option>';
-				echo '<option value=0>no</option>';
-			echo '</select>';
-			echo '<label for="is-pinned2"> pinned?</label>';
-			echo '<select id="is-pinned2" name="is-pinned">';
-				echo '<option value=1>yes</option>';
-				echo '<option value=0 selected>no</option>';
-			echo '</select><br>';
-			echo '<textarea id="content" name="content"></textarea>';
-			echo '</div>';
-
-			echo '<button id="submit" type="submit">Submit</button>';
-			echo '  <span id="error"></span>';
-			echo '<script type="text/javascript" src="./js/new_entry.js"></script>';
-
-			echo '</form>';
-			echo '<script type="text/javascript">var listCategories = '.json_encode($list_categories).'</script>';
-			if (isset($id) && $type == 1) {			
-				$caricature = $this->Caricature_DAO->caricature_by_id($id);
-				if (empty($caricature)) {
-					header("Location: new.php");
-				}
-				$caricature['is_pinned'] = $this->Timeline_DAO->is_pinned($id, 1);
-				$caricature = json_encode($caricature);
-				echo '<script type="text/javascript">var caricature = '.$caricature.';</script>';			
-				echo '<script type="text/javascript">fillCaricatureData(caricature)</script>';
-			} else if (isset($id) && $type == 2) {			
-				$post = $this->Post_DAO->post_by_id($id);
-				if (empty($post)) {
-					header("Location: new.php");
-				}
-				$post['is_pinned'] = $this->Timeline_DAO->is_pinned($id, 2);
-				$post = json_encode($post);
-				echo '<script type="text/javascript">var post = '.$post.' </script>';
-				echo '<script type="text/javascript">fillPostData(post)</script>';
-			}
-		} else {
-			echo "HOW DID YOU GET HERE?!";
-		}
-	}
+	
 
 	public function show_user_group_menu() {
 		if ($this->User_DAO->check_if_admin()) {
@@ -298,58 +208,6 @@ class View {
 			echo '</select>';
 		}
 	}
-
-	public function new_user_form() {		
-		echo '<h4 id="title" class="title">Login:</h4>';
-		echo '<form id="user-management" method="post" action="usr7.php">';
-		echo '<select id="operation" name="operation">';
-			echo '<option value="login" selected>login</option>';
-			echo '<option value="new">new</option>';
-		echo '</select><br>';
-		echo '<div id="user-login">';
-		echo '<label for="username">user:</label>';
-		echo '<input type="text" id="username" name="username"><br>';
-		echo '<label for="password">pass:</label>';
-		echo '<input type="password" id="password" name="password"><br>';
-		echo '</div>';
-		echo '<div id="create-user">';
-		$this->show_user_group_menu();
-		echo '<br>';
-		echo '<label for="new-user">new username:</label>';
-		echo '<input type="text" id="new-user" name="new-user"><br>';
-
-		echo '<label for="new-password">new password</label>';
-		echo '<input type="password" id="new-password" name="new-password"><br>';
-
-		echo '<label for="new-password2">repeat password</label>';
-		echo '<input type="password" id="new-password2" name="new-password2">   ';
-		echo '<span id="password-error">.</span><br>';
-
-		echo '<label for="email">e-mail address</label>';
-		echo '<input type="text" id="email" name="email"><br>';
-
-		echo '<label for="email2">repeat e-mail</label>';
-		echo '<input type="text" id="email2" name="email2">    ';
-		echo '<span id="email-error">.</span><br>';
-
-		echo '<label for="full-name">Full Name</label>';
-		echo '<input type="text" id="full-name" name="full-name"><br>';
-		
-		echo '<select id="sex" name="sex">';
-			echo '<option value="male" selected>male</option>';
-			echo '<option value="female">female</option>';
-		echo '</select><br>';
-
-		echo '<textarea id="notes" name="notes" placeholder="notes"></textarea>';
-
-		echo '</div>';
-		echo '<button id="submit" type="submit">Submit</button>';
-		echo '</form>';
-		if (!$this->User_DAO->check_if_admin()) {
-			echo '<script type="text/javascript" src="./js/usr7.js"></script>';
-			echo '<script type="text/javascript">disableNewUser()</script>';
-		}
-	}	
 
 	public function show_timeline_post($timeline_element) {
 		echo '<div class="timeline">';
@@ -425,6 +283,19 @@ class View {
 			echo '</div>';
 		}
 	}
+
+	public static function login_form($action = '"manage-admin.php"') {
+		echo '<form id="user-management" method="post" action='.$action.'>';
+		echo '<div id="user-login">';
+		echo '<label for="username">user:</label>';
+		echo '<input type="text" id="username" name="username"><br>';
+		echo '<label for="password">pass:</label>';
+		echo '<input type="password" id="password" name="password"><br>';
+		echo '<button id="submit" type="submit">Submit</button>';
+		echo '</div>';
+		echo '</form>';
+	}
+
 }
 
 ?>

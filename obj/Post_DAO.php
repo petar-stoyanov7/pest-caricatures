@@ -40,8 +40,10 @@ class Post_DAO {
 
 	public function new_post($post) {
 		$insert = "INSERT INTO $this->posts_table (`title`, `text`, `is_post`, `date`) ";
-		$values = "VALUES ('$post->title', '$post->text', $post->is_post, '$post->date')";
-		$post_id = $this->db->execute_query($insert.$values);
+		$values = "VALUES (?, ?, ?, ?)";
+		$values_array = [$post->title, $post->text, $post->is_post, $post->date];
+		$query = $insert.$values;
+		$post_id = $this->db->execute_advanced($query, $values_array);
 		if ($post->is_post == 1) {
 			$timeline_item = new Timeline($this->timeline_id, $post_id, $post->is_pinned, $post->date);
 			$this->Timeline_DAO->add_new_item($timeline_item);
@@ -60,26 +62,31 @@ class Post_DAO {
 	public function update_post($http_post, $id) {
 		$is_pinned = $this->Timeline_DAO->is_pinned($id, 2);
 		$post = $this->post_by_id($id);
-		$timeline_item = new Timeline($this->timeline_id, $id, $http_post['is-pinned'], $post['date']);
-		if ($post['is_post'] == 0 && $http_post['is-post'] == 1) {
-			$this->Timeline_DAO->add_new_item($timeline_item);
-		} else if (($post['is_post'] == 1) && ($http_post['is-post'] == 0)) {
+		$timeline_item = new Timeline($this->timeline_id, $id, $http_post['is-pinned2'], $post['date']);
+		if ($post['is_post'] == 0 && $http_post['is-post2'] == 1) {
+			$item = $this->Timeline_DAO->item_by_iid($post['id'], 2);
+			if (empty($item)) {
+				$this->Timeline_DAO->add_new_item($timeline_item);
+			}
+		} else if (($post['is_post'] == 1) && ($http_post['is-post2'] == 0)) {
 			$this->Timeline_DAO->delete_entry($id, 2);
-		} else if ($http_post['is-pinned'] != $is_pinned) {
+		} if ($http_post['is-pinned2'] != $is_pinned) {
 			$this->Timeline_DAO->update_item($timeline_item);
 		}
 		$query = "UPDATE $this->posts_table SET
-					`title` = '".$http_post['title']."',
-					`text` = '".$http_post['content']."',
-					`is_post` = ".$http_post['is-post']."
-					WHERE `id` = ".$id;
-		$this->db->execute_query($query);
+					`title` = ?,
+					`text` = ?,
+					`is_post` = ?
+					WHERE `id` = ?";
+		$values_array = [$http_post['title'], $http_post['content'], $http_post['is-post2'], $id];
+		$this->db->execute_advanced($query, $values_array);
 	}
 
 	public function delete_post($id) {
-		$query = "DELETE FROM $this->posts_table WHERE `id` = ".$id;
+		$query = "DELETE FROM $this->posts_table WHERE `id` = ?";
+		$values_array = [$id];
 		$this->Timeline_DAO->delete_entry($id, 2);
-		$this->db->execute_query($query);
+		$this->db->execute_advanced($query, $values_array);
 	}
 }
 

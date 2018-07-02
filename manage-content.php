@@ -1,6 +1,7 @@
 <?php
 $css_array = array('main.css');
 $js_array = array('toolbar.js');
+ob_start();
 require_once('header.php');
 $Caricature_DAO = new Caricature_DAO();
 $Post_DAO = new Post_DAO();
@@ -46,8 +47,9 @@ else if ($_POST['type'] == "caricature" && !isset($_POST['update'])) {
 }
 echo '<div class="site-content">';
 echo $action.$type.'<br>';
-// header("refresh:1; url=new.php");
+///header("refresh:1; url=new.php");
 echo '</div>';
+ob_end_flush();
 include('footer.php'); 
 
 ?>
