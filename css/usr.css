@@ -1,0 +1,24 @@
+div.usr-container {
+	background-color: white;
+	margin: auto;
+	width: 30%;
+	padding: 10px;
+
+	overflow: auto;
+	border: 1px solid black;
+	margin-top: 15px;
+	margin-bottom: 15px;
+	/*radius*/
+	-webkit-border-radius: 3px;
+	-moz-border-radius: 3px;
+	border-radius: 3px;
+	/*shadow*/
+	-webkit-box-shadow: 2px 2px 3px 0px rgba(0,0,0,0.75);
+	-moz-box-shadow: 2px 2px 3px 0px rgba(0,0,0,0.75);
+	box-shadow: 2px 2px 3px 0px rgba(0,0,0,0.75);
+}
+
+textarea#notes {
+	width: 400px;
+	height: 85px;
+}

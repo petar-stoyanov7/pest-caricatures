@@ -1,51 +1,48 @@
 <?php
+	
 	$css_array = array('main.css', 'caricature.css');
-	$js_array = array('toolbar.js');
+	$js_array = array('toolbar.js', 'navigate.js');
 	require_once('header.php');
 
-	$caricature = $_GET['caricature'];
+	$caricature_dao = new Caricature_DAO();
+	$View = new View();
+	
 	# This must be removed later on - intended just to show some titles!
-	switch ($caricature) {
-		case 'sra':
-			$title = "Сра процедури";
-			$description = "Мястото за релакс, отпускане на душата и други неща.";
-			$prev = 'paladka';
-			$next = 'rakiata';
-			break;
-		case 'rakiata':
-			$title = "Ракията се пробужда";
-			$description = "Пиян Соло и Чичака в поредното им приключение в земите на Шоплъка!";
-			$prev = 'sra';
-			$next = 'kornelias';			
-			break;
-		case 'kornelias':
-			$title = "Корнелиас Нинрънър";
-			$description = "Кралицата-банши на пенсионираните!";
-			$prev = 'rakiata';
-			$next = 'paladka';
-			break;
-		case 'paladka':
-			$title = "ПалаДка";
-			$description = "Вече къмпингуването е разрешено. В орпеделените за целта места. И при плащането на определените от \"държавата\" хора";
-			$prev = 'kornelias';
-			$next = 'sra';
-			break;		
-		default:
-			break;
-	}
+	## Why not titties?!
 ?>
 
 <div class='site-content'>
 <?php
-	echo "<h1 class='caricature-title'>".$title."</h1>";
-	echo "<a href='./static/".$caricature.".png' target='_blank'>";
-	echo "<img class='caricature' src='./static/".$caricature.".png'>";
-	echo "</a>";
-	echo "<span class='caricature-description'>".$description."</span><br>";
-	echo "<a id='caricature-prev' href='caricature.php?caricature=".$prev."'> << </a>";
-	echo "<a id='caricature-next' href='caricature.php?caricature=".$next."'> >> </a>";
-	echo '<script type="text/javascript" src="./js/navigate.js"></script>'
+	$View = new View();
+	
+	if (!isset($_GET['cid']) || $_GET['cid'] == "" || 
+		(isset($_GET['random']) && $_GET['random'] == 1)
+		) {
+		$caricature_id = $caricature_dao->random_caricature();
+		$Caricature = $caricature_dao->caricature_by_id($caricature_id);
+		$title = "[ Случайна ] ".$Caricature['title'];
+		$View->set_title("Случайна карикатура");
+		$next = "random=1";
+		$previous = "random=1";
+	} else {
+		$caricature_id = $_GET['cid'];
+		$gallery_id = $caricature_dao->get_category_by_id($caricature_id);
+		$Caricature = $caricature_dao->caricature_by_id($caricature_id);		
+		if (!isset($Caricature['id'])) {
+			header("Location: caricature.php?random=1");
+		}		
+		$title = $Caricature['title'];
+		$View->set_title($title);
+		$next_id = $caricature_dao->next_caricature($caricature_id, $gallery_id);
+		$previous_id = $caricature_dao->previous_caricature($caricature_id, $gallery_id);
+		$next = "cid=".$next_id;
+		$previous = "cid=".$previous_id;
+	}
+	$View->show_edit_content($Caricature['id'], 1);	
+	$View->show_caricature($Caricature, $next, $previous, $title);
+	
 ?>
+
 </div>
 
 <?php require_once('footer.php'); ?>

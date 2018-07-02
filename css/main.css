@@ -11,6 +11,10 @@ body {
 	height: 100%;
 }
 
+#edit-item {
+	float: right;
+}
+
 #navigation-bar {
 	margitn-top: 2px;
 	width: 60%;
@@ -69,17 +73,41 @@ div.site-content {
 	margin-left: 25%;
 	margin-right: 25%;
 	height: auto;
-	min-height: 80%;
+	min-height: 75%;
 	overflow: auto;
 }
 
 div.footer {
 	background-image: url("../img/bot-bar.png");
-	height: 15px;
+	height: 50px;
 	background-size: 15%;
 	text-align: center;
 	margin-left: auto;
 	margin-right: auto;
+}
+
+span.next {
+	float: right;
+}
+
+span.previous {
+	float: left;
+}
+
+div.timeline a {
+	color: #000000;
+	background-color: #FFFFFF;
+	text-decoration: none;
+}
+
+a:link {
+	color: #000000;
+	background-color: #e6e6e6;
+}
+
+a:visited {
+	color: #333333;
+	background-color: #e6e6e6;
 }
 
 footer {
@@ -89,4 +117,8 @@ footer {
     bottom: 0;
     height: 18px;
     width: 100%;
+}
+
+hr:last-of-type {
+	display: none;
 }

@@ -1,0 +1,28 @@
+div.timeline {
+	width: 95%;
+	padding: 10px;
+	/*border: 1px solid black;*/
+}
+
+.timeline-title {
+	margin: 0px 0px 2px 0px;
+	font-size: 1.7em;
+}
+
+.timeline-date {
+	margin-top: 2px;
+}
+
+.timeline-image {
+	display: block;
+	max-height: 10%;
+	max-width: 80%;
+	
+	margin-left: auto;
+	margin-right: auto;	
+}
+
+hr.division {
+	margin: 10px 0 10px 0;
+	color: red;
+}

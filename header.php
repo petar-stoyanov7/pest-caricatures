@@ -1,3 +1,11 @@
+<?php
+	function __autoload($classname) {
+		require_once("./obj/".$classname.".php");
+	}
+	require_once("functions.php");
+	$View = new View();
+	$View->first_visit();
+?>
 <!DOCTYPE html>
 <html>
 <head>
@@ -12,10 +20,7 @@
 	foreach ($css_array as $css) {
 		echo '<link rel="stylesheet" type="text/css" href="./css/'.$css.'">';
 	}
-
-	foreach ($js_array as $js) {
-		echo '<script type="text/javascript" src="./js/'.$js.'"></script>';
-	}
+	echo '<link rel="stylesheet" type="text/css" href="./css/popup.css">';
 	echo '<title>'.$title.'</title>';
 ?>
 	
@@ -31,16 +36,4 @@
 	</div>
 </header>
 <div id='anchor'></div>
-<div id='navigation-bar'>	
-		<div class='navbar'>
-			<span class='navbar-entry'>
-				<a href="./index.php">HOME</a>
-			</span>
-			<span class='navbar-entry'>
-				<a href="gallery.php">GALLERY</a>
-			</span>
-			<span class='navbar-entry'>
-				<a href="about.php">ABOUT</a>
-			</span>
-		</div>
-	</div>
+<?php $View->show_toolbar(); ?>		
